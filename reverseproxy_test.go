@@ -49,8 +49,13 @@ func Test_NewReverseProxy(t *testing.T) {
 		t.FailNow()
 	}
 
-	if client.Addr != "https://www.baidu.com" {
+	if client.Addr != "www.baidu.com" {
 		t.Error("wrong init hostclient addr")
+		t.FailNow()
+	}
+
+	if !client.IsTLS {
+		t.Error("wrong init hostclient tls")
 		t.FailNow()
 	}
 }

@@ -1,4 +1,4 @@
-module github.com/yeqown/fasthttp-reverse-proxy
+module github.com/savvi-ai/fasthttp-reverse-proxy
 
 require (
 	github.com/fasthttp/websocket v1.4.1

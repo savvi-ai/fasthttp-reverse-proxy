@@ -7,6 +7,7 @@ package proxy
 import (
 	"net"
 	"net/http"
+	"net/url"
 
 	"github.com/imdario/mergo"
 	"github.com/valyala/fasthttp"
@@ -85,7 +86,11 @@ func (p *ReverseProxy) init() {
 		p.bla = NewBalancer(p.ws)
 
 		for idx, addr := range p.opt.Addrs {
-			p.clients[idx] = &fasthttp.HostClient{Addr: addr}
+			parsedAddr, err := url.Parse(addr)
+			if err != nil {
+				panic(err)
+			}
+			p.clients[idx] = &fasthttp.HostClient{Addr: parsedAddr.Host, IsTLS: parsedAddr.Scheme == "https"}
 		}
 
 		return
@@ -94,8 +99,12 @@ func (p *ReverseProxy) init() {
 	// not open balancer
 	p.ws = append(p.ws, Weight(100))
 	p.bla = nil
-	p.clients = append(p.clients,
-		&fasthttp.HostClient{Addr: p.oldAddr})
+
+	parsedAddr, err := url.Parse(p.oldAddr)
+	if err != nil {
+		panic(err)
+	}
+	p.clients = append(p.clients, &fasthttp.HostClient{Addr: parsedAddr.Host, IsTLS: parsedAddr.Scheme == "https"})
 }
 
 func (p *ReverseProxy) getClient() *fasthttp.HostClient {
